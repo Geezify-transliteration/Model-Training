@@ -1,0 +1,16 @@
+# Install PyTorch + torch_xla[tpu] FIRST (see install_tpu_deps.sh). Do not list torch here.
+
+transformers>=4.40.0
+datasets>=2.16.0
+evaluate>=0.4.0
+accelerate>=0.30.0
+numpy>=1.24.0
+pandas>=2.0.0
+scikit-learn>=1.3.0
+sacrebleu>=2.4.0
+jiwer>=3.0.0
+sentencepiece>=0.1.99
+protobuf>=4.21.0
+gcsfs>=2024.1.0
+google-cloud-storage>=2.14.0
+google-auth>=2.23.0

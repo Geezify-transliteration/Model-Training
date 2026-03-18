@@ -1,0 +1,27 @@
+TPU training bundle (no Colab, no google.colab)
+
+curl ifconfig.me
+whoami
+
+1) Copy this whole `tpu_run` folder to your TPU VM (or clone the repo and cd here).
+
+2) Put your dataset CSV on the VM, e.g.:
+     mkdir -p data
+     scp merged_normalized.csv USER@TPU_VM:~/tpu_run/data/
+
+3) First-time setup + train in one go:
+     cd tpu_run
+     chmod +x install_tpu_deps.sh run_all.sh
+     ./run_all.sh --data_csv ./data/merged_normalized.csv
+
+   To train again without reinstalling wheels:
+     SKIP_TPU_INSTALL=1 ./run_all.sh --data_csv ./data/merged_normalized.csv
+
+4) Checkpoints (default): ./outputs/checkpoints
+   Final model (default): ./outputs/final_model
+
+5) Optional GCS (same layout as the notebook):
+     ./run_all.sh --data_csv ./data/merged_normalized.csv --gcs_bucket your-bucket-name
+
+Google reference for torch_xla on TPU VM:
+https://cloud.google.com/tpu/docs/run-calculation-pytorch
