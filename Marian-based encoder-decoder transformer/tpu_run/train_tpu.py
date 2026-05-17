@@ -162,6 +162,37 @@ def build_compute_metrics(tokenizer_ref, bleu_metric):
     return compute_metrics
 
 
+def _print_xla_tpu_devices() -> None:
+    pjrt = os.environ.get("PJRT_DEVICE", "")
+    if pjrt and pjrt.upper() != "TPU":
+        print(
+            f"Warning: PJRT_DEVICE={pjrt!r}; expected TPU. Try: export PJRT_DEVICE=TPU",
+            file=sys.stderr,
+        )
+    try:
+        devices = xm.get_xla_supported_devices("TPU")
+    except RuntimeError as exc:
+        err = str(exc).lower()
+        if "topology" in err or "global tpu" in err:
+            sys.exit(
+                "PyTorch/XLA could not read the TPU topology.\n\n"
+                "Checks:\n"
+                "  - export PJRT_DEVICE=TPU   (ensure you did not set PJRT_DEVICE=CPU)\n"
+                "  - unset XRT_TPU_CONFIG    (legacy XRT env vars conflict with PJRT)\n"
+                "  - pip show libtpu          (re-run repair_tpu_torch_abi.sh if missing)\n\n"
+                "Multi-host TPU slices (multiple VMs; hostname like ...-w-0, ...-w-1, ...):\n"
+                "  Start the same command on every worker together, not only on worker 0.\n"
+                "  Example:\n"
+                '    gcloud compute tpus tpu-vm ssh TPU_NAME --zone ZONE --worker=all \\\n'
+                '      --command="PJRT_DEVICE=TPU bash -lc \'cd /path/to/tpu_run && '
+                "python3 train_tpu.py --data_csv ./data/merged_normalized.csv\'\"\n"
+                "  https://cloud.google.com/tpu/docs/pytorch-pods\n\n"
+                f"Original error: {exc}"
+            )
+        raise
+    print("XLA TPU devices:", devices)
+
+
 def parse_args() -> argparse.Namespace:
     here = os.path.dirname(os.path.abspath(__file__))
     p = argparse.ArgumentParser(description="TPU transliteration training (mT5).")
@@ -215,7 +246,7 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
-    print("XLA TPU devices:", xm.get_xla_supported_devices("TPU"))
+    _print_xla_tpu_devices()
     here = os.path.dirname(os.path.abspath(__file__))
     final_dir = args.final_model_dir or os.path.join(here, "outputs", "final_model")
 

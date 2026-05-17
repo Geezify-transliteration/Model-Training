@@ -145,6 +145,34 @@ python3 -c "import torch_xla.core.xla_model as xm; print(xm.get_xla_supported_de
 
 ---
 
+## Troubleshooting: `Failed to get global TPU topology`
+
+That message means PJRT could not discover your TPU layout — **imports worked**, but the runtime cannot talk to the chips.
+
+**1. Single-host VM (e.g. one VM with 8 cores)** — usual checks:
+
+```bash
+echo "$PJRT_DEVICE"          # should be TPU (or empty; train_tpu.py defaults it)
+env | grep -i XRT            # should be empty; if XRT_TPU_CONFIG is set: unset XRT_TPU_CONFIG
+pip show libtpu torch-xla    # libtpu should be present with torch_xla[tpu]
+```
+
+Then reinstall the pinned stack if needed: `./repair_tpu_torch_abi.sh` (venv activated).
+
+**2. Multi-host TPU slice** (several VMs; SSH hostnames like `…-w-0`, `…-w-1`, …) — running **`python3 train_tpu.py` only on worker 0** often triggers this. Google expects the **same command on every worker at once**, e.g.:
+
+```bash
+gcloud compute tpus tpu-vm ssh "${TPU_NAME}" \
+  --zone="${ZONE}" --project="${PROJECT_ID}" --worker=all \
+  --command="PJRT_DEVICE=TPU bash -lc 'source \$HOME/pt-xla-env/bin/activate && cd \$HOME/Model-Training/.../tpu_run && python3 train_tpu.py --data_csv ./data/merged_normalized.csv'"
+```
+
+Adjust paths so **every worker** has the venv, repo, and CSV (copy/fuse to all nodes). Details: [Run PyTorch code on TPU slices](https://cloud.google.com/tpu/docs/pytorch-pods).
+
+**Note:** Hugging Face `Trainer` on **multi-host** TPUs usually needs an SPMD / multi-process setup beyond a single interactive shell; scaling across many VMs may require extra changes (see PyTorch/XLA distributed docs). Starting on a **single** TPU VM (e.g. v4-8) avoids this class of issues.
+
+---
+
 ## Useful `train_tpu.py` flags
 
 - `--data_csv` — required path to CSV.
