@@ -1,0 +1,31 @@
+# encoder_decoder_llm-2.ipynb / encoder_decoder_llm-2_tpu.ipynb
+# Install PyTorch separately for your platform (CUDA, CPU, or Colab/TPU stack):
+#   https://pytorch.org/get-started/locally/
+# TPU (XLA): Colab TPU images often include torch-xla. On a Google **Cloud TPU VM over SSH**,
+# install PyTorch + XLA from Google's libtpu index first (then the rest of this file), e.g.:
+#   pip install -U torch torch_xla[tpu] -f https://storage.googleapis.com/libtpu-releases/index.html
+# See: https://cloud.google.com/tpu/docs/run-calculation-pytorch
+# Export PJRT_DEVICE=TPU in the shell before Jupyter, or use encoder_decoder_llm-2_tpu.ipynb (sets it early).
+
+# Core ML / HF
+torch>=2.1.0
+transformers>=4.40.0
+datasets>=2.16.0
+evaluate>=0.4.0
+accelerate>=0.30.0
+
+# Data & metrics (notebook)
+numpy>=1.24.0
+pandas>=2.0.0
+scikit-learn>=1.3.0
+sacrebleu>=2.4.0
+jiwer>=3.0.0
+
+# Google Cloud (GCS checkpoints / gcsfs paths)
+gcsfs>=2024.1.0
+google-cloud-storage>=2.14.0
+google-auth>=2.23.0
+
+# Tokenizers / IO helpers (often pulled in by transformers; explicit is fine)
+sentencepiece>=0.1.99
+protobuf>=4.21.0

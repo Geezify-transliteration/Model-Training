@@ -1,0 +1,2 @@
+# Avoid CRLF in shell scripts on Linux/TPU VMs (bash\r errors).
+*.sh text eol=lf

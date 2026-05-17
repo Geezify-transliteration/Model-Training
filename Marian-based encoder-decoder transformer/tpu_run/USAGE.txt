@@ -1,5 +1,7 @@
 TPU training bundle (no Colab, no google.colab)
 
+Full guide (install, pitfalls, GCS, venv): README.md in this folder.
+
 curl ifconfig.me
 whoami
 
@@ -11,7 +13,7 @@ whoami
 
 3) First-time setup + train in one go:
      cd tpu_run
-     chmod +x install_tpu_deps.sh run_all.sh
+     chmod +x install_tpu_deps.sh run_all.sh repair_tpu_torch_abi.sh
      ./run_all.sh --data_csv ./data/merged_normalized.csv
 
    To train again without reinstalling wheels:

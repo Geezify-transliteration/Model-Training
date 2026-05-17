@@ -1,4 +1,4 @@
-# Install PyTorch + torch_xla[tpu] FIRST (see install_tpu_deps.sh). Do not list torch here.
+# Do not list torch/torch_xla here — versions are pinned in install_tpu_deps.sh (ABI match).
 
 transformers>=4.40.0
 datasets>=2.16.0
